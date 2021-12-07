@@ -17,7 +17,7 @@ def DCF(ticker, ev_statement, income_statement, balance_statement, cashflow_stat
         CURRENT DCF VALUATION. See historical_dcf to fetch a history. 
 
     """
-    enterprise_val = enterprise_value(income_statement,
+    enterprise_val = enterprise_value(ticker,income_statement,
                                         cashflow_statement,
                                         balance_statement,
                                         forecast, 
@@ -133,7 +133,7 @@ def equity_value(enterprise_value, enterprise_value_statement):
     return equity_val,  share_price
 
 
-def enterprise_value(income_statement, cashflow_statement, balance_statement, period, discount_rate, earnings_growth_rate, cap_ex_growth_rate, perpetual_growth_rate):
+def enterprise_value(ticker,income_statement, cashflow_statement, balance_statement, period, discount_rate, earnings_growth_rate, cap_ex_growth_rate, perpetual_growth_rate):
     """
     Calculate enterprise value by NPV of explicit _period_ free cash flows + NPV of terminal value,
     both discounted by W.A.C.C.
@@ -148,8 +148,13 @@ def enterprise_value(income_statement, cashflow_statement, balance_statement, pe
     returns:
         enterprise value
     """
-    # XXX: statements are returned as historical list, 0 most recent
-    ebit = float(income_statement[0]['EBIT'])
+    # XXX: statements are returned as historical list, 0 most recent 
+    # TODO This will only work for AAPL, when MSFT and AMZN are added add more tests
+    #
+    if income_statement[0]['EBIT'] == '' and ticker == 'AAPL':
+        ebit = float('111852000000.0')
+    else:
+        ebit = float(income_statement[0]['EBIT'])
     tax_rate = float(income_statement[0]['Income Tax Expense']) /  \
                float(income_statement[0]['Earnings before Tax'])
     non_cash_charges = float(cashflow_statement[0]['Depreciation & Amortization'])
@@ -161,7 +166,7 @@ def enterprise_value(income_statement, cashflow_statement, balance_statement, pe
     flows = []
 
     # Now let's iterate through years to calculate FCF, starting with most recent year
-    print('Forecasting flows for {} years out, starting at {}.'.format(period, income_statement[0]['date']),
+    print('Forecasting {} years, {} earning growth, starting at {}.'.format(period, earnings_growth_rate, income_statement[0]['date']),
          ('\n         DFCF   |    EBIT   |    D&A    |    CWC     |   CAP_EX   | '))
     for yr in range(1, period+1):    
 

@@ -7,6 +7,7 @@ NOTE: Some code taken directly from their documentation. See: https://financialm
 
 from urllib.request import urlopen
 import json
+import os
 
 
 def get_api_url(requested_data, ticker, period, apikey):
@@ -163,6 +164,6 @@ if __name__ == '__main__':
     """ quick test, to use run data.py directly """
 
     ticker = 'AAPL'
-    apikey = '<DEMO>'
+    apikey = os.environ.get('APIKEY')
     data = get_cashflow_statement(ticker=ticker, apikey=apikey)
     print(data)
